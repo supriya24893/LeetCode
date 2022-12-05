@@ -1,0 +1,20 @@
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| seat_id     | int  |
+| free        | bool |
++-------------+------+
+seat_id is an auto-increment primary key column for this table.
+Each row of this table indicates whether the ith seat is free or not. 1 means free while 0 means occupied.
+ 
+
+Write an SQL query to report all the consecutive available seats in the cinema.
+
+
+select distinct seat_id
+from
+(select * , lag (free,1) over (order by seat_id asc) as prev_seat,
+lead(free,1) over (order by seat_id asc) as next_seat
+from cinema) as tab1
+where (prev_seat=1 or next_seat=1) and free=1
+order by seat_id asc

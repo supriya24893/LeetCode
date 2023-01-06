@@ -1,0 +1,28 @@
+Table: Triangle
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| x           | int  |
+| y           | int  |
+| z           | int  |
++-------------+------+
+(x, y, z) is the primary key column for this table.
+Each row of this table contains the lengths of three line segments.
+ 
+
+Write an SQL query to report for every three line segments whether they can form a triangle.
+
+Return the result table in any order.
+
+/* Write your T-SQL query statement below */
+with sides as 
+(select *, (x+y) as side1, (y+z) as side2, (x+z) as side3
+from Triangle),
+
+triang as 
+(select * , case when side1>z and side2>x and side3>y then 'Yes'
+else 'No' end as triangle
+from sides)
+
+select x,y,z, triangle from triang;

@@ -1,0 +1,47 @@
+able: Product
+
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| product_id   | int     |
+| product_name | varchar |
+| unit_price   | int     |
++--------------+---------+
+product_id is the primary key of this table.
+Each row of this table indicates the name and the price of each product.
+Table: Sales
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| seller_id   | int     |
+| product_id  | int     |
+| buyer_id    | int     |
+| sale_date   | date    |
+| quantity    | int     |
+| price       | int     |
++-------------+---------+
+This table has no primary key, it can have repeated rows.
+product_id is a foreign key to the Product table.
+Each row of this table contains some information about one sale.
+ 
+
+Write an SQL query that reports the buyers who have bought S8 but not iPhone. Note that S8 and iPhone are products present in the Product table.
+
+Return the result table in any order.
+
+with comb_tab as(select a.product_id, a.product_name,b.buyer_id
+from Product as a
+join
+Sales as b
+on a.product_id=b.product_id)
+
+select buyer_id
+from
+(select buyer_id, sum(iphone_mark) as sm
+from
+(select *, case when product_name='iPhone' then 1 else 0 end as iphone_mark
+from comb_tab
+where product_name='S8' or product_name='iphone') as tab1
+group by buyer_id) as tab2
+where sm<1

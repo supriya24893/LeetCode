@@ -1,0 +1,39 @@
+able: Submissions
+
++---------------+----------+
+| Column Name   | Type     |
++---------------+----------+
+| sub_id        | int      |
+| parent_id     | int      |
++---------------+----------+
+There is no primary key for this table, it may have duplicate rows.
+Each row can be a post or comment on the post.
+parent_id is null for posts.
+parent_id for comments is sub_id for another post in the table.
+ 
+
+Write an SQL query to find the number of comments per post. The result table should contain post_id and its corresponding number_of_comments.
+
+The Submissions table may contain duplicate comments. You should count the number of unique comments per post.
+
+The Submissions table may contain duplicate posts. You should treat them as one post.
+
+The result table should be ordered by post_id in ascending order.
+
+The query result format is in the following example.
+
+ 
+WITH tb1 AS(
+select DISTINCT sub_id 
+from Submissions
+where parent_id is NULL),
+
+tb2 as
+(select  a.sub_id, b.sub_id as comments
+from tb1 as a
+left join Submissions as b
+on a.sub_id=b.parent_id)
+
+select sub_id as post_id, count(distinct comments) as number_of_comments
+from tb2
+group by sub_id

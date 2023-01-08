@@ -1,0 +1,26 @@
+Table: Employee
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| employee_id   | int     |
+| team_id       | int     |
++---------------+---------+
+employee_id is the primary key for this table.
+Each row of this table contains the ID of each employee and their respective team.
+ 
+
+Write an SQL query to find the team size of each of the employees.
+
+Return result table in any order.
+
+The query result format is in the following example.
+
+
+SELECT employee_id, num_emp as team_size
+from Employee as tb2
+JOIN
+(select team_id, count(distinct employee_id) as num_emp from
+Employee
+group by team_id) as tb1
+on tb2.team_id=tb1.team_id

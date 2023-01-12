@@ -1,0 +1,73 @@
+Table: Customers
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| customer_id   | int     |
+| name          | varchar |
+| country       | varchar |
++---------------+---------+
+customer_id is the primary key for this table.
+This table contains information about the customers in the company.
+ 
+
+Table: Product
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| product_id    | int     |
+| description   | varchar |
+| price         | int     |
++---------------+---------+
+product_id is the primary key for this table.
+This table contains information on the products in the company.
+price is the product cost.
+ 
+
+Table: Orders
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| order_id      | int     |
+| customer_id   | int     |
+| product_id    | int     |
+| order_date    | date    |
+| quantity      | int     |
++---------------+---------+
+order_id is the primary key for this table.
+This table contains information on customer orders.
+customer_id is the id of the customer who bought "quantity" products with id "product_id".
+Order_date is the date in format ('YYYY-MM-DD') when the order was shipped.
+ 
+
+Write an SQL query to report the customer_id and customer_name of customers who have spent at least $100 in each month of June and July 2020.
+
+
+with tab1 as
+(select a.customer_id, a.name, a.country, d.product_id, d.price, d.order_id, d.order_date, d.quantity
+from Customers as a
+join 
+(select b.product_id, b.price, c.order_id, c.customer_id, c.order_date,c.quantity
+from  Product as b
+join
+Orders as c
+on b.product_id=c.product_id
+where order_date>='2020-06-01'and order_date<='2020-07-31') as d
+on a.customer_id=d.customer_id)
+
+
+select distinct customer_id, name
+from
+(select customer_id, name , count(distinct mnth) as num_mnth
+from
+(select customer_id,name, mnth, sum(spent) as total
+from
+(select * , quantity*price as spent, MONTH(order_date) as mnth 
+from 
+tab1) as tab2
+group by customer_id,name, mnth
+having sum(spent)>=100) as tab3
+group by customer_id, name
+having count(distinct mnth)=2) as tab4

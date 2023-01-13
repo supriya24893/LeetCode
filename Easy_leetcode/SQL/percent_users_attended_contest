@@ -1,0 +1,38 @@
+SQL Schema
+Table: Users
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| user_id     | int     |
+| user_name   | varchar |
++-------------+---------+
+user_id is the primary key for this table.
+Each row of this table contains the name and the id of a user.
+ 
+
+Table: Register
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| contest_id  | int     |
+| user_id     | int     |
++-------------+---------+
+(contest_id, user_id) is the primary key for this table.
+Each row of this table contains the id of a user and the contest they registered into.
+ 
+
+Write an SQL query to find the percentage of the users registered in each contest rounded to two decimals.
+
+Return the result table ordered by percentage in descending order. In case of a tie, order it by contest_id in ascending order.
+
+select contest_id, ROUND(count(distinct user_id)*100.00/(select count(distinct user_id) from Users),2) AS percentage
+from
+(select a.contest_id,b.user_id
+from Register as a
+Left join
+Users as b
+on a.user_id=b.user_id) as t1
+group by contest_id
+order by percentage DESC,contest_id ASC

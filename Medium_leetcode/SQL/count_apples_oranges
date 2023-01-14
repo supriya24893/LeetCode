@@ -1,0 +1,39 @@
+SQL Schema
+Table: Boxes
+
++--------------+------+
+| Column Name  | Type |
++--------------+------+
+| box_id       | int  |
+| chest_id     | int  |
+| apple_count  | int  |
+| orange_count | int  |
++--------------+------+
+box_id is the primary key for this table.
+chest_id is a foreign key of the chests table.
+This table contains information about the boxes and the number of oranges and apples they have. Each box may include a chest, which also can contain oranges and apples.
+ 
+
+Table: Chests
+
++--------------+------+
+| Column Name  | Type |
++--------------+------+
+| chest_id     | int  |
+| apple_count  | int  |
+| orange_count | int  |
++--------------+------+
+chest_id is the primary key for this table.
+This table contains information about the chests and the corresponding number of oranges and apples they have.
+ 
+
+Write an SQL query to count the number of apples and oranges in all the boxes. If a box contains a chest, you should also include the number of apples and oranges it has.
+
+select sum(total_app) as apple_count, sum(total_oranges) as orange_count
+from
+(select b_apple_count+c_apple_count as total_app, b_orange_count+c_orange_count as total_oranges
+from
+(select b.box_id,b.chest_id,b.apple_count as b_apple_count,b.orange_count as b_orange_count, isnull(c.apple_count,0) as c_apple_count, isnull(c.orange_count,0) as c_orange_count  from Boxes as b 
+left join
+Chests as c
+on b.chest_id=c.chest_id) as t1) as t2

@@ -1,0 +1,25 @@
+Table: UserVisits
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| user_id     | int  |
+| visit_date  | date |
++-------------+------+
+This table does not have a primary key.
+This table contains logs of the dates that users visited a certain retailer.
+ 
+
+Assume today's date is '2021-1-1'.
+
+Write an SQL query that will, for each user_id, find out the largest window of days between each visit and the one right after it (or today if you are considering the last visit).
+
+Return the result table ordered by user_id.
+
+select user_id, max(datediff(day,visit_date,next_date)) as biggest_window
+from
+(select user_id, visit_date, lead(visit_date,1,'2021-1-1') over 
+(partition by user_id order by visit_date) as next_date
+from UserVisits) as t1
+group by user_id
+order by user_id

@@ -1,0 +1,75 @@
+Table: Contests
+
++--------------+------+
+| Column Name  | Type |
++--------------+------+
+| contest_id   | int  |
+| gold_medal   | int  |
+| silver_medal | int  |
+| bronze_medal | int  |
++--------------+------+
+contest_id is the primary key for this table.
+This table contains the LeetCode contest ID and the user IDs of the gold, silver, and bronze medalists.
+It is guaranteed that any consecutive contests have consecutive IDs and that no ID is skipped.
+ 
+
+Table: Users
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| user_id     | int     |
+| mail        | varchar |
+| name        | varchar |
++-------------+---------+
+user_id is the primary key for this table.
+This table contains information about the users.
+ 
+
+Write an SQL query to report the name and the mail of all interview candidates. A user is an interview candidate if at least one of these two conditions is true:
+
+The user won any medal in three or more consecutive contests.
+The user won the gold medal in three or more different contests (not necessarily consecutive).
+Return the result table in any order.
+
+with tab1 as(
+    select contest_id, 'gold' as med_type, gold_medal as user_id_won 
+    from Contests
+    union all
+    select contest_id, 'silver' as med_type, silver_medal as user_id_won 
+    from Contests
+    union all
+    select contest_id, 'bronze' as med_type, bronze_medal as user_id_won 
+    from Contests
+
+),
+
+tab2 as (select contest_id, med_type, user_id_won, mail, name from tab1
+join
+Users 
+on tab1.user_id_won=Users.user_id),
+
+tab3 as (select name, mail, count(distinct contest_id) as diff_contests
+from (select * 
+from tab2 
+where med_type='gold') as t1
+group by name, mail),
+
+tab4 as (
+  
+    select contest_id, user_id_won,name, mail, case when (lead1_contest_id-contest_id)=1 and (lead2_contest_id-contest_id)=2 then 1 else 0 end
+    as consecutive
+
+    from
+    (select *, lead(contest_id,1) over (partition by user_id_won order by contest_id)
+    as lead1_contest_id, lead(contest_id,2) over (partition by user_id_won order by contest_id)
+    as lead2_contest_id
+    from tab2) as t2)
+
+select name, mail 
+from tab4
+where consecutive=1
+union 
+select name, mail from
+tab3
+where diff_contests>=3

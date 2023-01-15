@@ -1,0 +1,27 @@
+Table: Transactions
+
++----------------+----------+
+| Column Name    | Type     |
++----------------+----------+
+| transaction_id | int      |
+| day            | datetime |
+| amount         | int      |
++----------------+----------+
+transaction_id is the primary key for this table.
+Each row contains information about one transaction.
+ 
+
+Write an SQL query to report the IDs of the transactions with the maximum amount on their respective day. If in one day there are multiple such transactions, return all of them.
+
+Return the result table ordered by transaction_id in ascending order.
+
+
+
+select transaction_id
+from
+(select *, rank() over (partition by date_only order by amount desc) as amt_rank
+from
+(SELECT transaction_id, CAST(DAY AS DATE) as date_only, amount
+from Transactions) as t1) as t2
+where amt_rank=1
+order by transaction_id

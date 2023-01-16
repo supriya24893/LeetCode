@@ -1,0 +1,66 @@
+Table Person:
+
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| id             | int     |
+| name           | varchar |
+| phone_number   | varchar |
++----------------+---------+
+id is the primary key for this table.
+Each row of this table contains the name of a person and their phone number.
+Phone number will be in the form 'xxx-yyyyyyy' where xxx is the country code (3 characters) and yyyyyyy is the phone number (7 characters) where x and y are digits. Both can contain leading zeros.
+ 
+
+Table Country:
+
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| name           | varchar |
+| country_code   | varchar |
++----------------+---------+
+country_code is the primary key for this table.
+Each row of this table contains the country name and its code. country_code will be in the form 'xxx' where x is digits.
+ 
+
+Table Calls:
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| caller_id   | int  |
+| callee_id   | int  |
+| duration    | int  |
++-------------+------+
+There is no primary key for this table, it may contain duplicates.
+Each row of this table contains the caller id, callee id and the duration of the call in minutes. caller_id != callee_id
+ 
+
+A telecommunications company wants to invest in new countries. The company intends to invest in the countries where the average call duration of the calls in this country is strictly greater than the global average call duration.
+
+Write an SQL query to find the countries where this company can invest.
+
+Return the result table in any order.
+
+with global_avg as (
+    select avg(duration) as global_avg
+    from Calls
+),
+
+tab1 as (select caller_id,callee_id,duration,t1.name as person_name, t2.name as country_name
+    from
+    (select c.*, p.name,LEFT(p.phone_number,3) AS country_code
+    from Calls as c
+    join Person as p
+    on c.caller_id=p.id or c.callee_id=p.id) as t1
+    join Country as t2
+    on t1.country_code=t2.country_code
+)
+
+select distinct country_name as country
+from
+(select country_name, avg(duration) as avg_dur_country
+from tab1
+group by country_name
+having avg(duration)>(select global_avg from global_avg)) as t3

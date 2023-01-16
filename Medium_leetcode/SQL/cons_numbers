@@ -1,0 +1,24 @@
+SQL Schema
+Table: Logs
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| num         | varchar |
++-------------+---------+
+id is the primary key for this table.
+id is an autoincrement column.
+ 
+
+Write an SQL query to find all numbers that appear at least three times consecutively.
+
+Return the result table in any order.
+
+select distinct num as ConsecutiveNums
+from
+(select num, count (*) over (partition by num,diff order by num) as count
+from
+(select num, id-row_number() over (partition by num order by id) as diff
+from Logs) as t) as u
+where count>=3

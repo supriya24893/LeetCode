@@ -1,0 +1,24 @@
+
+Table: Logs
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| log_id        | int     |
++---------------+---------+
+log_id is the primary key for this table.
+Each row of this table contains the ID in a log Table.
+ 
+
+Write an SQL query to find the start and end number of continuous ranges in the table Logs.
+
+Return the result table ordered by start_id.
+
+select min(log_id) as start_id, max(log_id) as end_id
+from
+(select log_id, rank-log_id as diff
+from
+(select *, row_number() over (order by log_id) as rank
+from Logs) as t1) as t2
+group by diff
+order by start_id
